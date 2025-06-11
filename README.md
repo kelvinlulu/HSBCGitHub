@@ -10,3 +10,15 @@
 
 1. 提 issue 功能目前尚未实现。
 2. 由于时间仓促，开发过程未遵循 TDD（测试驱动开发）模式。
+3. 没有添加混淆，目前apk体积偏大
+
+### 技术方案
+
+1.**UI**：Jetpack Compose（Material 3 设计）
+2.**逻辑**：MVVM 架构（ViewModel + LiveData）
+3.**网络**：Retrofit + Coroutine
+4.**数据**：Kotlin 数据类建模
+
+### UMl类图
+
+![alt text](images/uml.png)
