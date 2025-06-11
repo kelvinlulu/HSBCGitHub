@@ -1,43 +1,37 @@
 package com.hsbc.github.network
 
-import com.hsbc.github.GitHubApp
-import com.hsbc.github.utils.SecureStorage
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/**
+ * Retrofit客户端配置与实例管理
+ * 用于创建和管理Retrofit实例，提供API接口访问
+ */
 object RetrofitClient {
-    private const val BASE_URL = "https://api.github.com/"
 
+    /**
+     * GitHub API主客户端
+     * - 基础URL：https://api.github.com/（用于常规API请求）
+     * - 使用Gson转换器解析JSON响应
+     * - 采用懒加载方式初始化（首次使用时创建）
+     */
     val api: GitHubApi by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl("https://api.github.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(GitHubApi::class.java)
     }
 
-    val oauthApi = Retrofit.Builder()
+    /**
+     * OAuth认证专用客户端
+     * - 基础URL：https://github.com/（用于OAuth认证流程）
+     * - 与主客户端使用不同的BaseURL以适配认证接口
+     * - 直接初始化实例（非懒加载）
+     */
+    val oauthApi: GitHubApi = Retrofit.Builder()
         .baseUrl("https://github.com/")
-        .addConverterFactory(GsonConverterFactory.create()) // ✅ Gson 转换器
+        .addConverterFactory(GsonConverterFactory.create()) // Gson转换器用于解析JSON响应
         .build()
         .create(GitHubApi::class.java)
-
-    // 新增：GitHub API 客户端（用于用户信息、仓库等）
-    private val apiClient = OkHttpClient.Builder()
-        .addInterceptor { chain ->
-            val originalRequest = chain.request()
-            val token = SecureStorage(GitHubApp.applicationContext()).getAccessToken()
-
-            if (token != null) {
-                val request = originalRequest.newBuilder()
-                    .header("Authorization", "Bearer $token")
-                    .build()
-                chain.proceed(request)
-            } else {
-                chain.proceed(originalRequest)
-            }
-        }
-        .build()
-
 }

@@ -15,10 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,61 +33,49 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import com.hsbc.github.MainActivity
-import com.hsbc.github.model.Repo
 import com.hsbc.github.model.Repository
 import com.hsbc.github.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
-import kotlin.getValue
 
+/**
+ * 仓库列表活动类
+ * 用于展示当前登录用户的GitHub仓库列表
+ */
 class RepoListActivity : ComponentActivity() {
+    // 获取认证视图模型实例，用于获取用户仓库数据
     private val authViewModel: AuthViewModel by viewModels()
-
-
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 获取AuthCode
-        val authCode = intent.getStringExtra("auth_code") ?: run {
-            Log.e("RepoList", "未接收到AuthCode")
-            finish()
-            return
-        }
-
+        // 在协程中调用视图模型获取用户仓库数据
         lifecycleScope.launch {
             try {
-                val response = authViewModel.fetchAndSaveAccessToken(authCode)
-                // 2. 使用Token获取用户信息
-                authViewModel.fetchUserInfo()
                 authViewModel.fetchUserRepositories()
-
-
-                Log.d("Auth", "Token: ${response.access_token}")
             } catch (e: Exception) {
                 Log.e("Auth", "Error: ${e.message}")
             }
         }
-
-        Log.d("RepoList", "接收到AuthCode: $authCode")
-
         setContent {
+            // 收集仓库数据状态（初始值为null）
             val repos by authViewModel.repos.collectAsState(initial = null)
+            // 收集加载状态（控制进度指示器显示）
             val isLoading by authViewModel.isLoading.collectAsState(initial = false)
+            // 收集错误信息（网络请求失败时显示）
             val errorMessage by authViewModel.errorMessage.collectAsState(initial = null)
-            val user by authViewModel.user.collectAsState(initial = null)
 
             MaterialTheme {
                 Scaffold(
                     topBar = {
                         TopAppBar(
                             title = {
-                                Text("${user?.name}的仓库列表") // 显示"XXX的仓库列表"
+                                // 显示"用户登录名的仓库列表"
+                                Text("${authViewModel.getUserLogin() }的仓库列表")
                             },
                             navigationIcon = {
+                                // 顶部栏返回按钮，点击关闭当前页面
                                 IconButton(onClick = {
-                                    // 点击返回按钮时关闭当前Activity
                                     finish()
                                 }) {
                                     Icon(
@@ -99,28 +85,30 @@ class RepoListActivity : ComponentActivity() {
                                 }
                             }
                         )
-
                     }
                 ) { padding ->
                     Surface(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(padding), // 避免内容被TopAppBar遮挡
+                            .padding(padding), // 添加内边距避免顶部栏遮挡内容
                         color = MaterialTheme.colorScheme.background
                     ) {
+                        // 根据不同状态显示对应界面
                         when {
+                            isLoading -> LoadingScreen() // 加载中状态
+                            errorMessage != null -> ErrorScreen(errorMessage!!) // 错误状态
                             repos != null -> RepoListScreen(repos!!, onItemClick = { repo ->
+                                // 点击仓库项时跳转到详情页
                                 Intent(
                                     this@RepoListActivity,
                                     RepoDetailActivity::class.java
                                 ).also { intent ->
-                                    intent.putExtra("owner", user?.login ?: return@also)
+                                    intent.putExtra("owner", authViewModel.getUserLogin())
                                     intent.putExtra("repoName", repo.name)
                                     intent.putExtra("token", authViewModel.getAccessToken())
                                     startActivity(intent)
                                 }
                             })
-                            else -> Text("暂无仓库数据", Modifier.padding(16.dp))
                         }
                     }
                 }
@@ -129,32 +117,43 @@ class RepoListActivity : ComponentActivity() {
     }
 }
 
+/**
+ * 仓库列表组件
+ * 展示所有仓库项的懒加载列表
+ */
 @Composable
 fun RepoListScreen(repos: List<Repository>, onItemClick: (Repository) -> Unit) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(repos.size) { index ->
+            // 渲染单个仓库项组件
             RepositoryItem(repo = repos[index], onItemClick = onItemClick)
         }
     }
 }
 
+/**
+ * 仓库项组件
+ * 展示单个仓库的名称、描述和星标数
+ */
 @Composable
 fun RepositoryItem(repo: Repository, onItemClick: (Repository) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .clickable { onItemClick(repo) },
+            .clickable { onItemClick(repo) }, // 点击事件回调
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // 仓库名称（加粗显示）
             Text(
                 text = repo.name,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
             )
+            // 仓库描述（非空时显示）
             if (repo.description != null) {
                 Text(
                     text = repo.description,
@@ -163,6 +162,7 @@ fun RepositoryItem(repo: Repository, onItemClick: (Repository) -> Unit) {
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
+            // 星标数（带星星图标）
             Row(
                 modifier = Modifier.padding(top = 16.dp),
                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
@@ -182,4 +182,3 @@ fun RepositoryItem(repo: Repository, onItemClick: (Repository) -> Unit) {
         }
     }
 }
-

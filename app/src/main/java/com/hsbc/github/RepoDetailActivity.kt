@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,11 +26,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hsbc.github.model.Repo
 import com.hsbc.github.viewmodel.RepoDetailViewModel
+
+/**
+ * 仓库详情页面活动类
+ * 用于展示GitHub仓库的详细信息，包括描述、作者和星标数
+ */
 
 class RepoDetailActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -82,10 +84,9 @@ class RepoDetailActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background
                     ) {
                         when {
-                            isLoading -> LoadingScreenInDetail()
-                            errorMessage != null -> ErrorScreenInDetail(message = viewModel.errorMessage.value!!)
+                            isLoading -> LoadingScreen()
+                            errorMessage != null -> ErrorScreen(errorMessage = viewModel.errorMessage.value!!)
                             repo != null -> RepoDetailScreen(repo = viewModel.repo.value!!)
-                            else -> EmptyScreen()
                         }
                     }
                 }
@@ -94,6 +95,7 @@ class RepoDetailActivity : ComponentActivity() {
     }
 }
 
+// 仓库详情
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RepoDetailScreen(repo: Repo) {
@@ -137,29 +139,5 @@ fun RepoDetailScreen(repo: Repo) {
     }
 }
 
-// 辅助组件（可单独定义）
-@Composable
-fun LoadingScreenInDetail() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}
 
-@Composable
-fun ErrorScreenInDetail(message: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = message, color = Color.Red)
-    }
-}
-
-@Composable
-fun EmptyScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            text = "请选择一个仓库",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
 
