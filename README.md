@@ -6,6 +6,22 @@
 4. **仓库列表展示**：展示 `https://api.github.com/repositories` 返回的仓库列表。
 5. **交互设计**：顶部栏动态显示登录状态（用户名/登录按钮），支持退出登录操作。
 
+### 界面展示
+1. **热门仓库列表** 展示
+![alt text](images/repository_main.png)
+
+2. **登录后个人仓库列表** 展示
+![alt text](images/repository_list.png)
+
+3. **仓库详情** 展示
+![alt text](images/repository_detail.png)
+
+4. **根据语言搜索仓库** 展示（这里以搜索C为例子，星级最多的仓库是linux）
+![alt text](images/repository_search.png)
+
+5. **按照更新时间，根据语言搜索仓库** 展示（这里以搜索C为例子，星级最多的仓库是linux）
+![alt text](images/repository_search_time.png)
+
 ### 尚未完成的功能
 
 1. 提 issue 功能目前尚未实现。
