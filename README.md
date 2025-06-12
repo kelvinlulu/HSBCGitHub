@@ -7,34 +7,33 @@
 5. **交互设计**：顶部栏动态显示登录状态（用户名/登录按钮），支持退出登录操作。
 
 ### 界面展示
-1. **热门仓库列表** 展示
-![alt text](images/repository_main.png)
+1. **热门仓库列表** 展示  
+   <img src="images/repository_main.png" width="400" alt="alt text">
 
-2. **登录后个人仓库列表** 展示
-![alt text](images/repository_list.png)
+2. **登录后个人仓库列表** 展示  
+   <img src="images/repository_list.png" width="400" alt="alt text">
 
-3. **仓库详情** 展示
-![alt text](images/repository_detail.png)
+3. **仓库详情** 展示  
+   <img src="images/repository_detail.png" width="400" alt="alt text">
 
-4. **根据语言搜索仓库** 展示（这里以搜索C为例子，星级最多的仓库是linux）
-![alt text](images/repository_search.png)
+4. **根据语言搜索仓库** 展示（以搜索C为例，星级最高的仓库是linux）  
+   <img src="images/repository_search.png" width="400" alt="alt text">
 
-5. **按照更新时间，根据语言搜索仓库** 展示（这里以搜索C为例子，星级最多的仓库是linux）
-![alt text](images/repository_search_time.png)
+5. **按更新时间搜索C语言仓库** 展示（星级最高的仓库是linux）  
+   <img src="images/repository_search_time.png" width="400" alt="alt text">
 
 ### 尚未完成的功能
 
-1. 提 issue 功能目前尚未实现。
-2. 由于时间仓促，开发过程未遵循 TDD（测试驱动开发）模式。
-3. 没有添加混淆，目前apk体积偏大
+1. 提 issue 功能尚未实现。
+2. 开发未遵循 TDD（测试驱动开发）模式。
+3. 未添加混淆，apk体积偏大。
 
 ### 技术方案
 
-1.**UI**：Jetpack Compose（Material 3 设计）
-2.**逻辑**：MVVM 架构（ViewModel + LiveData）
-3.**网络**：Retrofit + Coroutine
-4.**数据**：Kotlin 数据类建模
+1. **UI**：Jetpack Compose（Material 3 设计）
+2. **逻辑**：MVVM 架构（ViewModel + LiveData）
+3. **网络**：Retrofit + Coroutine
+4. **数据**：Kotlin 数据类建模
 
-### UMl类图
-
-![alt text](images/uml.png)
+### UMl类图  
+<img src="images/uml.png" alt="alt text">
